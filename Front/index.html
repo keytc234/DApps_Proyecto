@@ -4,51 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <title>DApp Préstamos</title>
-    <link rel="stylesheet" href="index.css">
-  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <h1>DApp de Préstamos</h1>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5 fw-bold text-primary">💰 DApp de Préstamos</h1>
 
-    <!-- Registrar Usuario -->
-    <section>
-        <h2>Registrar Usuario</h2>
-        <button id="btnRegistrar">Registrar</button>
-    </section>
+        <div class="row g-4">
 
-    <section>
-        <h2>Depositar (Pagos Automáticos)</h2>
-        <input type="number" id="inputMontoDeposito" placeholder="Monto en ETH">
-        <button id="btnDepositar">Depositar</button>
-    </section>
+            <!-- Registrar Usuario -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Registrar Usuario</h5>
+                        <button id="btnRegistrar" class="btn btn-primary w-100 mt-3">Registrar</button>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Depositar -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">Depositar (Pagos Automáticos)</h5>
+                        <input type="number" id="inputMontoDeposito" class="form-control mb-3"
+                            placeholder="Monto en ETH">
+                        <button id="btnDepositar" class="btn btn-success w-100">Depositar</button>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Crear Préstamo -->
-    <section>
-        <h2>Crear Préstamo</h2>
-        <input type="text" id="inputPrestatario" placeholder="Dirección prestatario">
-        <input type="number" id="inputMonto" placeholder="Monto">
-        <input type="number" id="inputPlazo" placeholder="Plazo (meses)">
-        <button id="btnCrearPrestamo">Crear</button>
-    </section>
+            <!-- Crear Préstamo -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning">Crear Préstamo</h5>
+                        <input type="text" id="inputPrestatario" class="form-control mb-2"
+                            placeholder="Dirección prestatario">
+                        <input type="number" id="inputMonto" class="form-control mb-2" placeholder="Monto">
+                        <input type="number" id="inputPlazo" class="form-control mb-3" placeholder="Plazo (meses)">
+                        <button id="btnCrearPrestamo" class="btn btn-warning w-100">Crear</button>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Pagar Cuota -->
-    <section>
-        <h2>Pagar Cuota</h2>
-        <input type="number" id="inputIdPrestamo" placeholder="ID Préstamo">
-        <button id="btnPagar">Pagar Cuota</button>
-    </section>
+            <!-- Pagar Cuota -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-info">Pagar Cuota</h5>
+                        <input type="number" id="inputIdPrestamo" class="form-control mb-3" placeholder="ID Préstamo">
+                        <button id="btnPagar" class="btn btn-info w-100">Pagar</button>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Penalización -->
-    <section>
-        <h2>Aplicar Penalización</h2>
-        <input type="number" id="inputIdPenal" placeholder="ID Préstamo">
-        <input type="number" id="inputMontoPenal" placeholder="Monto Penalización">
-        <button id="btnPenalizar">Aplicar</button>
-    </section>
+            <!-- Penalización -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">Aplicar Penalización</h5>
+                        <input type="number" id="inputIdPenal" class="form-control mb-2" placeholder="ID Préstamo">
+                        <input type="number" id="inputMontoPenal" class="form-control mb-3"
+                            placeholder="Monto Penalización">
+                        <button id="btnPenalizar" class="btn btn-danger w-100">Aplicar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="app.js"></script>
 </body>
 
