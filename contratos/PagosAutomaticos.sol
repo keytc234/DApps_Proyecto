@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract PagosAutomaticos {
-    mapping(address => uint256) public balances;
+interface IRegistroUsuarios {
+    function estaRegistrado(address usuario) external view returns (bool);
 
+    function obtenerPrestamista() external view returns (address); // <--- esto
+}
+
+contract PagosAutomaticos {
+    IRegistroUsuarios registroUsuarios;
     event PagoRealizado(address prestatario, uint256 monto);
 
-    // Función para que prestatario deposite fondos antes de pagar cuotas
-    function depositar() external payable {
-        balances[msg.sender] += msg.value;
+    constructor(address _registroUsuarios) {
+        registroUsuarios = IRegistroUsuarios(_registroUsuarios);
     }
 
-    // Esta función la llama GestionPrestamo para cobrar la cuota
-    function cobrarPago(address prestatario, uint256 monto)
-        external
-        returns (bool)
-    {
-        require(balances[prestatario] >= monto, "Fondos insuficientes");
-        balances[prestatario] -= monto;
-        emit PagoRealizado(prestatario, monto);
+    // Función para que el prestatario pague directamente
+    function cobrarPago(uint256 cuotaEsperada) external payable returns (bool) {
+        require(msg.value == cuotaEsperada, "Debes enviar el monto exacto de la cuota");
+        payable(registroUsuarios.obtenerPrestamista()).transfer(msg.value);
+        emit PagoRealizado(msg.sender, msg.value);
         return true;
     }
 }

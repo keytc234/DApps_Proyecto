@@ -8,6 +8,8 @@ contract Auditoria {
         uint256 monto,
         uint256 timestamp
     );
+    event PrestamoCreado(address prestatario, uint256 monto);
+    event PrestamoFinalizado(address prestatario);
 
     function registrarPago(address prestatario, uint256 monto) external {
         emit RegistroPago(prestatario, monto, block.timestamp);
@@ -17,5 +19,13 @@ contract Auditoria {
         external
     {
         emit RegistroPenalizacion(prestatario, monto, block.timestamp);
+    }
+
+    function crearPrestamo(address prestatario, uint256 monto) external {
+        emit PrestamoCreado(prestatario, monto);
+    }
+
+    function crearFinalizacion(address prestatario) external {
+        emit PrestamoFinalizado(prestatario);
     }
 }
