@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract Auditoria {
+    // Eventos para el registro de acciones.
     event RegistroPago(address prestatario, uint256 monto, uint256 timestamp);
     event RegistroPenalizacion(
         address prestatario,
@@ -11,6 +12,7 @@ contract Auditoria {
     event PrestamoCreado(address prestatario, uint256 monto);
     event PrestamoFinalizado(address prestatario);
 
+    // Funciones que solo emiten eventos, sin cambiar el estado.
     function registrarPago(address prestatario, uint256 monto) external {
         emit RegistroPago(prestatario, monto, block.timestamp);
     }

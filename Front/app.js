@@ -1,6 +1,18 @@
-// 📌 Direcciones y ABIs reales después de desplegar
-const registroUsuariosAddress = "0xcC5F6255fD1F7B7083C7753414A83ac43d2eF5dA";
+const registroUsuariosAddress = "0x754C1536EF0d1B13FF6A84737FaF6d7E57ef42FC";
 const registroUsuariosABI = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "prestamista",
+				"type": "address"
+			}
+		],
+		"name": "PrestamistaAsignado",
+		"type": "event"
+	},
 	{
 		"anonymous": false,
 		"inputs": [
@@ -22,7 +34,65 @@ const registroUsuariosABI = [
 				"type": "address"
 			}
 		],
+		"name": "esPrestamista",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "usuario",
+				"type": "address"
+			}
+		],
 		"name": "estaRegistrado",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "obtenerPrestamista",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "prestamista",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "prestamistaAsignado",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -61,7 +131,7 @@ const registroUsuariosABI = [
 	}
 ]
 
-const gestionPrestamoAddress = "0x73dC051e0F1c856676E34B36cfc290B06D677576";
+const gestionPrestamoAddress = "0x638A27a4B3021fF7887B5fa0dc8A10491107841a";
 const gestionPrestamoABI = [
 	{
 		"inputs": [
@@ -77,55 +147,17 @@ const gestionPrestamoABI = [
 			},
 			{
 				"internalType": "address",
-				"name": "_penalizaciones",
+				"name": "_fondosPrestamista",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_auditoria",
 				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "prestatario",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "monto",
-				"type": "uint256"
-			}
-		],
-		"name": "PrestamoCreado",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "montoPenalizacion",
-				"type": "uint256"
-			}
-		],
-		"name": "aplicarPenalizacion",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"inputs": [
@@ -143,6 +175,11 @@ const gestionPrestamoABI = [
 				"internalType": "uint256",
 				"name": "plazo",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "multa",
+				"type": "uint256"
 			}
 		],
 		"name": "crearPrestamo",
@@ -151,24 +188,18 @@ const gestionPrestamoABI = [
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
 		"name": "pagarCuota",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "address",
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
 		"name": "prestamos",
@@ -204,6 +235,16 @@ const gestionPrestamoABI = [
 				"type": "uint256"
 			},
 			{
+				"internalType": "uint256",
+				"name": "nextDueDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "porcentajeMulta",
+				"type": "uint256"
+			},
+			{
 				"internalType": "bool",
 				"name": "activo",
 				"type": "bool"
@@ -211,24 +252,22 @@ const gestionPrestamoABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "siguienteId",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
 	}
 ]
 
-const pagosAutomaticosAddress = "0xF1a771D76d5312D303956C5986185754E7518dE4";
+const pagosAutomaticosAddress = "0x1EafaaB555BF0a06f049328ec564779273813D78";
 const pagosAutomaticosABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_registroUsuarios",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
 	{
 		"anonymous": false,
 		"inputs": [
@@ -251,32 +290,8 @@ const pagosAutomaticosABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "balances",
-		"outputs": [
-			{
 				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "prestatario",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "monto",
+				"name": "cuotaEsperada",
 				"type": "uint256"
 			}
 		],
@@ -288,27 +303,31 @@ const pagosAutomaticosABI = [
 				"type": "bool"
 			}
 		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "depositar",
-		"outputs": [],
 		"stateMutability": "payable",
 		"type": "function"
 	}
 ]
 
-const penalizacionesAddress = "0x065D0066a75a87415e46B627ab63FEb8879dDDc4";
-const penalizacionesABI = [
+const fondoPrestamistaAddress = "0x1144BfCFA1a404B5a13eBbAD3A5C4C0EB0959bDC";
+const fondoPrestamistaABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_registroUsuarios",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
 	{
 		"anonymous": false,
 		"inputs": [
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "prestatario",
+				"name": "prestamista",
 				"type": "address"
 			},
 			{
@@ -318,36 +337,38 @@ const penalizacionesABI = [
 				"type": "uint256"
 			}
 		],
-		"name": "PenalizacionAplicada",
+		"name": "FondosDepositados",
 		"type": "event"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
 				"internalType": "address",
-				"name": "prestatario",
+				"name": "destinatario",
 				"type": "address"
 			},
 			{
+				"indexed": false,
 				"internalType": "uint256",
 				"name": "monto",
 				"type": "uint256"
 			}
 		],
-		"name": "aplicarPenalizacion",
+		"name": "FondosTransferidos",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "depositarFondos",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "multas",
+		"inputs": [],
+		"name": "saldo",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -357,6 +378,24 @@ const penalizacionesABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "destinatario",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "monto",
+				"type": "uint256"
+			}
+		],
+		"name": "transferirFondos",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]
 
@@ -365,106 +404,113 @@ let accounts;
 let registroUsuarios;
 let gestionPrestamo;
 let pagosAutomaticos;
-let penalizaciones;
+let fondoPrestamista;
 
+// Espera a que el documento esté completamente cargado antes de ejecutar cualquier código
 window.addEventListener('load', async () => {
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
-        await ethereum.request({ method: 'eth_requestAccounts' });
-        accounts = await web3.eth.getAccounts();
+        try {
+            await ethereum.request({ method: 'eth_requestAccounts' });
+            accounts = await web3.eth.getAccounts();
 
-        registroUsuarios = new web3.eth.Contract(registroUsuariosABI, registroUsuariosAddress);
-        gestionPrestamo = new web3.eth.Contract(gestionPrestamoABI, gestionPrestamoAddress);
-        pagosAutomaticos = new web3.eth.Contract(pagosAutomaticosABI, pagosAutomaticosAddress);
-        penalizaciones = new web3.eth.Contract(penalizacionesABI, penalizacionesAddress);
+            registroUsuarios = new web3.eth.Contract(registroUsuariosABI, registroUsuariosAddress);
+            gestionPrestamo = new web3.eth.Contract(gestionPrestamoABI, gestionPrestamoAddress);
+            pagosAutomaticos = new web3.eth.Contract(pagosAutomaticosABI, pagosAutomaticosAddress);
+            fondoPrestamista = new web3.eth.Contract(fondoPrestamistaABI, fondoPrestamistaAddress);
 
-        console.log("Conectado a la cuenta:", accounts[0]);
-    } else {
-        alert("Por favor instala MetaMask");
-    }
-});
+            console.log("Conectado a la cuenta:", accounts[0]);
 
-// 📌 Registrar usuario
-document.getElementById("btnRegistrar").addEventListener("click", async () => {
-    try {
-        const accounts = await ethereum.request({ method: 'eth_accounts' });
+            // Mueve la lógica de los botones aquí dentro
+            // 📌 Registrar usuario
+            document.getElementById("btnRegistrar").addEventListener("click", async () => {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length === 0) {
+                        alert("No hay ninguna cuenta activa en MetaMask");
+                        return;
+                    }
+                    await registroUsuarios.methods.registrarUsuario().send({ from: accounts[0] });
+                    alert("Usuario registrado con la cuenta activa en MetaMask");
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al registrar el usuario");
+                }
+            });
 
-        if (accounts.length === 0) {
-            alert("No hay ninguna cuenta activa en MetaMask");
-            return;
-        }
+            // 📌 Crear préstamo
+            document.getElementById("btnCrearPrestamo").addEventListener("click", async () => {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length === 0) {
+                        alert("No hay ninguna cuenta activa en MetaMask");
+                        return;
+                    }
+                    const prestatario = document.getElementById("inputPrestatario").value;
+                    const montoETH = document.getElementById("inputMonto").value;
+                    const plazo = document.getElementById("inputPlazo").value;
+                    const multa = document.getElementById("inputMulta").value;
+                    const montoWei = web3.utils.toWei(montoETH, "ether");
+                    await gestionPrestamo.methods.crearPrestamo(prestatario, montoWei, plazo, multa).send({ from: accounts[0] });
+                    alert("Préstamo creado");
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al crear el préstamo");
+                }
+            });
 
-        // accounts[0] es la cuenta que el usuario tiene seleccionada en MetaMask
-        await registroUsuarios.methods.registrarUsuario()
-            .send({ from: accounts[0] });
+            // 📌 Pagar cuotas
+            document.getElementById("btnPagar").addEventListener("click", async () => {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length === 0) {
+                        alert("No hay ninguna cuenta activa en MetaMask");
+                        return;
+                    }
+                    const prestatario = accounts[0];
+                    const prestamo = await gestionPrestamo.methods.prestamos(prestatario).call();
+                    const cuotaWei = prestamo.cuotaMensual;
+                    const cuotaETH = web3.utils.fromWei(cuotaWei, 'ether');
+                    await gestionPrestamo.methods.pagarCuota().send({ from: prestatario, value: cuotaWei });
+                    alert(`Cuota de ${cuotaETH} ETH pagada exitosamente.`);
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al pagar la cuota. Asegúrate de tener un préstamo activo y el monto suficiente.");
+                }
+            });
 
-        alert("Usuario registrado con la cuenta activa en MetaMask");
-    } catch (error) {
-        console.error(error);
-        alert("Error al registrar el usuario");
-    }
-});
 
-// 📌 Crear préstamo
-document.getElementById("btnCrearPrestamo").addEventListener("click", async () => {
-    const prestatario = document.getElementById("inputPrestatario").value;
-    const monto = web3.utils.toWei(document.getElementById("inputMonto").value, "ether");
-    const plazo = document.getElementById("inputPlazo").value;
-
-    await gestionPrestamo.methods.crearPrestamo(prestatario, monto, plazo)
-        .send({ from: accounts[0] });
-
-    alert("Préstamo creado");
-});
-
-// 📌 Depositar fondos para pagar cuotas
-document.getElementById("btnDepositar").addEventListener("click", async () => {
-    const monto = web3.utils.toWei(document.getElementById("inputMontoDeposito").value, "ether");
-
-    const accounts = await ethereum.request({ method: 'eth_accounts' });
-
-    if (accounts.length === 0) {
-        alert("No hay ninguna cuenta activa en MetaMask");
-        return;
-    }
-
-    await pagosAutomaticos.methods.depositar()
-        .send({ from: accounts[0], value: monto });
-
-    alert("Depósito realizado");
-});
-
-// 📌 Pagar cuotas
-document.getElementById("btnPagar").addEventListener("click", async () => {
-    const idPrestamo = document.getElementById("inputIdPrestamo").value;
-
-    const accounts = await ethereum.request({ method: 'eth_accounts' });
-
-    if (accounts.length === 0) {
-        alert("No hay ninguna cuenta activa en MetaMask");
-        return;
-    }
-
-    await gestionPrestamo.methods.pagarCuota(idPrestamo)
-        .send({ from: accounts[0] });
-
-    alert("Cuota pagada");
-});
-
-// 📌 Aplicar penalización
-document.getElementById("btnPenalizar").addEventListener("click", async () => {
-    const idPrestamo = document.getElementById("inputIdPenal").value;
-    const montoPenal = web3.utils.toWei(document.getElementById("inputMontoPenal").value, "ether");
-
-    const accounts = await ethereum.request({ method: 'eth_accounts' });
+document.getElementById("btnDepositarPrestamista").addEventListener("click", async () => {
+  try {
+    // 📌 Mejor práctica: Solicitar conexión primero, luego obtener las cuentas
+    // Esto asegura que la billetera esté conectada antes de continuar
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
     if (accounts.length === 0) {
-        alert("No hay ninguna cuenta activa en MetaMask");
-        return;
+      alert("Por favor, conecta tu cuenta de MetaMask.");
+      return;
     }
 
-    await gestionPrestamo.methods.aplicarPenalizacion(idPrestamo, montoPenal)
-        .send({ from: accounts[0] });
+    const montoETH = document.getElementById("inputMontoPrestamista").value;
+    if (!montoETH || parseFloat(montoETH) <= 0) {
+      alert("Por favor, ingresa un monto válido (mayor que 0).");
+      return;
+    }
 
-    alert("Penalización aplicada");
+    // Convertir el monto de ETH a Wei, asegurando que sea un string
+    const montoWei = web3.utils.toWei(montoETH.toString(), 'ether');
+
+    // 📌 El objeto 'value' en el método 'send' es lo que transfiere el ETH
+    await fondoPrestamista.methods.depositarFondos().send({
+      from: accounts[0],
+      value: montoWei
+    });
+
+    alert(`¡Transacción exitosa! Se han depositado ${montoETH} ETH.`);
+
+  } catch (error) {
+    console.error("Error al depositar fondos:", error);
+    alert("Error al depositar fondos. Asegúrate de que eres el prestamista y que la transacción fue aprobada.");
+  }
+});
 });

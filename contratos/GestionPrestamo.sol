@@ -1,30 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IRegistroUsuarios {
-    function estaRegistrado(address usuario) external view returns (bool);
-}
+// Importamos los contratos completos.
+import "./Auditoria.sol";
+import "./FondosPrestamista.sol";
+import "./RegistroUsuarios.sol";
 
+// Interfaces para los contratos de los que solo necesitamos la definición de sus funciones.
 interface IPagosAutomaticos {
     function cobrarPago(uint256 cuotaEsperada) external payable returns (bool);
 }
 
 interface IFondosPrestamista {
-    function retirarFondos(address destinatario, uint256 monto) external;
+    function transferirFondos(address destinatario, uint256 monto) external;
 }
 
 interface IAuditoria {
     function registrarPago(address prestatario, uint256 monto) external;
-
     function registrarPenalizacion(address prestatario, uint256 monto) external;
-
     function crearPrestamo(address prestatario, uint256 monto) external;
-
     function crearFinalizacion(address prestatario) external;
 }
 
 contract GestionPrestamo {
-    IRegistroUsuarios registroUsuarios;
+    RegistroUsuarios registroUsuarios;
     IPagosAutomaticos pagosAutomaticos;
     IFondosPrestamista fondosPrestamista;
     IAuditoria auditoria;
@@ -49,10 +48,15 @@ contract GestionPrestamo {
         address _fondosPrestamista,
         address _auditoria
     ) {
-        registroUsuarios = IRegistroUsuarios(_registroUsuarios);
+        registroUsuarios = RegistroUsuarios(_registroUsuarios);
         pagosAutomaticos = IPagosAutomaticos(_pagosAutomaticos);
         fondosPrestamista = IFondosPrestamista(_fondosPrestamista);
         auditoria = IAuditoria(_auditoria);
+    }
+
+    modifier soloPrestamista() {
+        require(registroUsuarios.esPrestamista(msg.sender), "Solo el prestamista puede crear prestamos");
+        _;
     }
 
     function crearPrestamo(
@@ -60,15 +64,12 @@ contract GestionPrestamo {
         uint256 monto,
         uint256 plazo,
         uint256 multa
-    ) external {
-        require(
-            registroUsuarios.estaRegistrado(prestatario),
-            "Prestatario no registrado"
-        );
+    ) external soloPrestamista {
+        require(registroUsuarios.estaRegistrado(prestatario), "Prestatario no registrado");
         require(monto > 0 && plazo > 0, "Datos invalidos");
-        require(!prestamos[msg.sender].activo, "Ya tienes un prestamo activo");
-
-        fondosPrestamista.retirarFondos(prestatario, monto);
+        require(!prestamos[prestatario].activo, "Este prestatario ya tiene un prestamo activo");
+        
+        fondosPrestamista.transferirFondos(prestatario, monto);
 
         uint256 cuota = monto / plazo;
 
@@ -85,8 +86,10 @@ contract GestionPrestamo {
         });
         auditoria.crearPrestamo(prestatario, monto);
     }
-
-    function pagarCuota() external {
+    
+    // Función para que el prestatario pague su propia cuota.
+    function pagarCuota() external payable {
+        // Obtenemos los datos del préstamo del prestatario que llama a la función (msg.sender).
         Prestamo storage p = prestamos[msg.sender];
         require(p.activo, "Prestamo no activo");
         require(p.saldoPendiente >= p.cuotaMensual, "Prestamo ya pagado");
@@ -96,14 +99,15 @@ contract GestionPrestamo {
             p.saldoPendiente += multa;
             auditoria.registrarPenalizacion(msg.sender, multa);
         }
-
-        bool pagado = pagosAutomaticos.cobrarPago(p.cuotaMensual);
+        
+        bool pagado = pagosAutomaticos.cobrarPago{value: msg.value}(p.cuotaMensual);
         require(pagado, "Pago fallido");
+        require(msg.value >= p.cuotaMensual, "El monto enviado es menor a la cuota mensual.");
 
         p.saldoPendiente -= p.cuotaMensual;
         p.pagosRealizados++;
         p.nextDueDate += 30 days;
-        // Si pagó todo
+        
         if (p.saldoPendiente == 0) {
             p.activo = false;
             auditoria.crearFinalizacion(msg.sender);

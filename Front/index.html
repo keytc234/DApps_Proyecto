@@ -23,14 +23,14 @@
                 </div>
             </div>
 
-            <!-- Depositar -->
+            <!-- Depositar Fondos Prestamista -->
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <h5 class="card-title text-success">Depositar (Pagos Automáticos)</h5>
-                        <input type="number" id="inputMontoDeposito" class="form-control mb-3"
+                        <h5 class="card-title text-primary">Depositar Fondos Prestamista</h5>
+                        <input type="number" id="inputMontoPrestamista" class="form-control mb-3"
                             placeholder="Monto en ETH">
-                        <button id="btnDepositar" class="btn btn-success w-100">Depositar</button>
+                        <button id="btnDepositarPrestamista" class="btn btn-primary w-100">Depositar</button>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,8 @@
                         <input type="text" id="inputPrestatario" class="form-control mb-2"
                             placeholder="Dirección prestatario">
                         <input type="number" id="inputMonto" class="form-control mb-2" placeholder="Monto">
-                        <input type="number" id="inputPlazo" class="form-control mb-3" placeholder="Plazo (meses)">
+                        <input type="number" id="inputPlazo" class="form-control mb-2" placeholder="Plazo (meses)">
+                        <input type="number" id="inputMulta" class="form-control mb-3" placeholder="Multa (%)">
                         <button id="btnCrearPrestamo" class="btn btn-warning w-100">Crear</button>
                     </div>
                 </div>
@@ -54,25 +55,11 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h5 class="card-title text-info">Pagar Cuota</h5>
-                        <input type="number" id="inputIdPrestamo" class="form-control mb-3" placeholder="ID Préstamo">
+                        <p id="infoCuota" class="card-text text-secondary">Cuota Mensual: Cargando...</p>
                         <button id="btnPagar" class="btn btn-info w-100">Pagar</button>
                     </div>
                 </div>
             </div>
-
-            <!-- Penalización -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger">Aplicar Penalización</h5>
-                        <input type="number" id="inputIdPenal" class="form-control mb-2" placeholder="ID Préstamo">
-                        <input type="number" id="inputMontoPenal" class="form-control mb-3"
-                            placeholder="Monto Penalización">
-                        <button id="btnPenalizar" class="btn btn-danger w-100">Aplicar</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
