@@ -1,4 +1,4 @@
-const registroUsuariosAddress = "0x754C1536EF0d1B13FF6A84737FaF6d7E57ef42FC";
+const registroUsuariosAddress = "0xC7e6dBF769922f7cE8e80e62e19608721Ed365aF";
 const registroUsuariosABI = [
 	{
 		"anonymous": false,
@@ -131,7 +131,7 @@ const registroUsuariosABI = [
 	}
 ]
 
-const gestionPrestamoAddress = "0x638A27a4B3021fF7887B5fa0dc8A10491107841a";
+const gestionPrestamoAddress = "0xABB7D0D481608D4b4aa695E9070884B3F6f495D8";
 const gestionPrestamoABI = [
 	{
 		"inputs": [
@@ -255,7 +255,7 @@ const gestionPrestamoABI = [
 	}
 ]
 
-const pagosAutomaticosAddress = "0x1EafaaB555BF0a06f049328ec564779273813D78";
+const pagosAutomaticosAddress = "0xA153daC70e2523DE11eE219Ad72159AE9B0B8Fe8";
 const pagosAutomaticosABI = [
 	{
 		"inputs": [
@@ -308,7 +308,7 @@ const pagosAutomaticosABI = [
 	}
 ]
 
-const fondoPrestamistaAddress = "0x1144BfCFA1a404B5a13eBbAD3A5C4C0EB0959bDC";
+const fondoPrestamistaAddress = "0x16278cd320EaE5945be05289Eb33f73c14c5b179";
 const fondoPrestamistaABI = [
 	{
 		"inputs": [
@@ -425,12 +425,20 @@ window.addEventListener('load', async () => {
             // 📌 Registrar usuario
             document.getElementById("btnRegistrar").addEventListener("click", async () => {
                 try {
-                    const accounts = await ethereum.request({ method: 'eth_accounts' });
-                    if (accounts.length === 0) {
+                    const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (currentAccounts.length === 0) {
                         alert("No hay ninguna cuenta activa en MetaMask");
                         return;
                     }
-                    await registroUsuarios.methods.registrarUsuario().send({ from: accounts[0] });
+
+                    // Verificar si el usuario ya está registrado
+                    const isRegistered = await registroUsuarios.methods.estaRegistrado(currentAccounts[0]).call();
+                    if (isRegistered) {
+                        alert("Este usuario ya está registrado.");
+                        return;
+                    }
+
+                    await registroUsuarios.methods.registrarUsuario().send({ from: currentAccounts[0] });
                     alert("Usuario registrado con la cuenta activa en MetaMask");
                 } catch (error) {
                     console.error(error);
@@ -441,8 +449,8 @@ window.addEventListener('load', async () => {
             // 📌 Crear préstamo
             document.getElementById("btnCrearPrestamo").addEventListener("click", async () => {
                 try {
-                    const accounts = await ethereum.request({ method: 'eth_accounts' });
-                    if (accounts.length === 0) {
+                    const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (currentAccounts.length === 0) {
                         alert("No hay ninguna cuenta activa en MetaMask");
                         return;
                     }
@@ -451,7 +459,7 @@ window.addEventListener('load', async () => {
                     const plazo = document.getElementById("inputPlazo").value;
                     const multa = document.getElementById("inputMulta").value;
                     const montoWei = web3.utils.toWei(montoETH, "ether");
-                    await gestionPrestamo.methods.crearPrestamo(prestatario, montoWei, plazo, multa).send({ from: accounts[0] });
+                    await gestionPrestamo.methods.crearPrestamo(prestatario, montoWei, plazo, multa).send({ from: currentAccounts[0] });
                     alert("Préstamo creado");
                 } catch (error) {
                     console.error(error);
@@ -462,12 +470,12 @@ window.addEventListener('load', async () => {
             // 📌 Pagar cuotas
             document.getElementById("btnPagar").addEventListener("click", async () => {
                 try {
-                    const accounts = await ethereum.request({ method: 'eth_accounts' });
-                    if (accounts.length === 0) {
+                    const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (currentAccounts.length === 0) {
                         alert("No hay ninguna cuenta activa en MetaMask");
                         return;
                     }
-                    const prestatario = accounts[0];
+                    const prestatario = currentAccounts[0];
                     const prestamo = await gestionPrestamo.methods.prestamos(prestatario).call();
                     const cuotaWei = prestamo.cuotaMensual;
                     const cuotaETH = web3.utils.fromWei(cuotaWei, 'ether');
@@ -479,38 +487,39 @@ window.addEventListener('load', async () => {
                 }
             });
 
+            // 📌 Depositar fondos
+            document.getElementById("btnDepositarPrestamista").addEventListener("click", async () => {
+                try {
+                    const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
+                    if (currentAccounts.length === 0) {
+                        alert("Por favor, conecta tu cuenta de MetaMask.");
+                        return;
+                    }
 
-document.getElementById("btnDepositarPrestamista").addEventListener("click", async () => {
-  try {
-    // 📌 Mejor práctica: Solicitar conexión primero, luego obtener las cuentas
-    // Esto asegura que la billetera esté conectada antes de continuar
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const montoETH = document.getElementById("inputMontoPrestamista").value;
+                    if (!montoETH || parseFloat(montoETH) <= 0) {
+                        alert("Por favor, ingresa un monto válido (mayor que 0).");
+                        return;
+                    }
 
-    if (accounts.length === 0) {
-      alert("Por favor, conecta tu cuenta de MetaMask.");
-      return;
+                    const montoWei = web3.utils.toWei(montoETH.toString(), 'ether');
+
+                    await fondoPrestamista.methods.depositarFondos().send({
+                        from: currentAccounts[0],
+                        value: montoWei
+                    });
+
+                    alert(`¡Transacción exitosa! Se han depositado ${montoETH} ETH.`);
+
+                } catch (error) {
+                    console.error("Error al depositar fondos:", error);
+                    alert("Error al depositar fondos. Asegúrate de que eres el prestamista y que la transacción fue aprobada.");
+                }
+            });
+        } catch (error) {
+            console.error("Error al conectar a MetaMask:", error);
+        }
+    } else {
+        alert("Por favor, instala MetaMask.");
     }
-
-    const montoETH = document.getElementById("inputMontoPrestamista").value;
-    if (!montoETH || parseFloat(montoETH) <= 0) {
-      alert("Por favor, ingresa un monto válido (mayor que 0).");
-      return;
-    }
-
-    // Convertir el monto de ETH a Wei, asegurando que sea un string
-    const montoWei = web3.utils.toWei(montoETH.toString(), 'ether');
-
-    // 📌 El objeto 'value' en el método 'send' es lo que transfiere el ETH
-    await fondoPrestamista.methods.depositarFondos().send({
-      from: accounts[0],
-      value: montoWei
-    });
-
-    alert(`¡Transacción exitosa! Se han depositado ${montoETH} ETH.`);
-
-  } catch (error) {
-    console.error("Error al depositar fondos:", error);
-    alert("Error al depositar fondos. Asegúrate de que eres el prestamista y que la transacción fue aprobada.");
-  }
-});
 });
