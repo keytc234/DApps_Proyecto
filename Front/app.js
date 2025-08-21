@@ -1,4 +1,4 @@
-const registroUsuariosAddress = "0xB2E1c3EBd5661141f8B6a43Ba104565cE58967fB";
+const registroUsuariosAddress = "0x0D6d788564A75b56E53493637e17F9a3d5Fc3a7e";
 const registroUsuariosABI = [
 	{
 		"anonymous": false,
@@ -131,7 +131,7 @@ const registroUsuariosABI = [
 	}
 ]
 
-const gestionPrestamoAddress = "0xa21b4376618B05C4E0ecD2129244b1B7d677EfB9";
+const gestionPrestamoAddress = "0xAEB3beeb7D6e2B63131Ad3d233788f45687eAcab";
 const gestionPrestamoABI = [
 	{
 		"inputs": [
@@ -265,7 +265,7 @@ const gestionPrestamoABI = [
 	}
 ];
 
-const pagosAutomaticosAddress = "0x4eC9b4316aaF942163A144a4aeF370c1339037FD";
+const pagosAutomaticosAddress = "0x10884cFe7078806916f8FA6FaB8bc78F79049100";
 const pagosAutomaticosABI = [
 	{
 		"inputs": [
@@ -318,7 +318,7 @@ const pagosAutomaticosABI = [
 	}
 ]
 
-const fondoPrestamistaAddress = "0x97268B99390DB65c2c99845ED97411E436e4dEf6";
+const fondoPrestamistaAddress = "0x7b69382266FB472f2c22d8634FC1b2ad7bDE49d8";
 const fondoPrestamistaABI = [
 	{
 		"inputs": [
