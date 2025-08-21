@@ -17,8 +17,11 @@ interface IFondosPrestamista {
 
 interface IAuditoria {
     function registrarPago(address prestatario, uint256 monto) external;
+
     function registrarPenalizacion(address prestatario, uint256 monto) external;
+
     function crearPrestamo(address prestatario, uint256 monto) external;
+
     function crearFinalizacion(address prestatario) external;
 }
 
@@ -37,6 +40,7 @@ contract GestionPrestamo {
         uint256 pagosRealizados;
         uint256 nextDueDate;
         uint256 porcentajeMulta;
+        uint256 tasaInteres;
         bool activo;
     }
 
@@ -55,7 +59,10 @@ contract GestionPrestamo {
     }
 
     modifier soloPrestamista() {
-        require(registroUsuarios.esPrestamista(msg.sender), "Solo el prestamista puede crear prestamos");
+        require(
+            registroUsuarios.esPrestamista(msg.sender),
+            "Solo el prestamista puede crear prestamos"
+        );
         _;
     }
 
@@ -63,12 +70,22 @@ contract GestionPrestamo {
         address prestatario,
         uint256 monto,
         uint256 plazo,
-        uint256 multa
+        uint256 multa,
+        uint256 interes
     ) external soloPrestamista {
-        require(registroUsuarios.estaRegistrado(prestatario), "Prestatario no registrado");
-        require(monto > 0 && plazo > 0, "Datos invalidos");
-        require(!prestamos[prestatario].activo, "Este prestatario ya tiene un prestamo activo");
-        
+        require(
+            registroUsuarios.estaRegistrado(prestatario),
+            "Prestatario no registrado"
+        );
+        require(
+            monto > 0 && plazo > 0 && multa > 0 && interes > 0,
+            "Datos invalidos"
+        );
+        require(
+            !prestamos[prestatario].activo,
+            "Este prestatario ya tiene un prestamo activo"
+        );
+
         fondosPrestamista.transferirFondos(prestatario, monto);
 
         uint256 cuota = monto / plazo;
@@ -82,11 +99,12 @@ contract GestionPrestamo {
             pagosRealizados: 0,
             nextDueDate: block.timestamp + 30 days,
             porcentajeMulta: multa,
+            tasaInteres: interes,
             activo: true
         });
         auditoria.crearPrestamo(prestatario, monto);
     }
-    
+
     // Función para que el prestatario pague su propia cuota.
     function pagarCuota() external payable {
         // Obtenemos los datos del préstamo del prestatario que llama a la función (msg.sender).
@@ -95,23 +113,30 @@ contract GestionPrestamo {
         require(p.saldoPendiente >= p.cuotaMensual, "Prestamo ya pagado");
 
         if (block.timestamp > p.nextDueDate) {
-            uint256 multa = (p.saldoPendiente * p.porcentajeMulta) / 100;
+            uint256 diasAtraso = (block.timestamp - p.nextDueDate) / 1 days;
+            uint256 multa = (p.saldoPendiente *
+                p.porcentajeMulta *
+                diasAtraso) / 100;
             p.saldoPendiente += multa;
             auditoria.registrarPenalizacion(msg.sender, multa);
         }
-        
-        bool pagado = pagosAutomaticos.cobrarPago{value: msg.value}(p.cuotaMensual);
+
+        uint256 intereses = (p.cuotaMensual * p.tasaInteres) / 100;
+        uint256 totalAPagar = p.cuotaMensual + intereses;
+
+        bool pagado = pagosAutomaticos.cobrarPago{value: msg.value}(
+            totalAPagar
+        );
         require(pagado, "Pago fallido");
-        require(msg.value >= p.cuotaMensual, "El monto enviado es menor a la cuota mensual.");
 
         p.saldoPendiente -= p.cuotaMensual;
         p.pagosRealizados++;
         p.nextDueDate += 30 days;
-        
+
         if (p.saldoPendiente == 0) {
             p.activo = false;
             auditoria.crearFinalizacion(msg.sender);
         }
-        auditoria.registrarPago(msg.sender, p.cuotaMensual);
+        auditoria.registrarPago(msg.sender, totalAPagar);
     }
 }
