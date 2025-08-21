@@ -1,4 +1,4 @@
-const registroUsuariosAddress = "0xc5aAd8ca909341710AfD1E425a50361cC80a7B60";
+const registroUsuariosAddress = "0xB2E1c3EBd5661141f8B6a43Ba104565cE58967fB";
 const registroUsuariosABI = [
 	{
 		"anonymous": false,
@@ -131,7 +131,7 @@ const registroUsuariosABI = [
 	}
 ]
 
-const gestionPrestamoAddress = "0xeFB1D8F6aD70Ea651779e21bAC0720059b5927B9";
+const gestionPrestamoAddress = "0xa21b4376618B05C4E0ecD2129244b1B7d677EfB9";
 const gestionPrestamoABI = [
 	{
 		"inputs": [
@@ -265,7 +265,7 @@ const gestionPrestamoABI = [
 	}
 ];
 
-const pagosAutomaticosAddress = "0x68a16b2a0E93E64c7aEB8304f6A2febCa8feb4be";
+const pagosAutomaticosAddress = "0x4eC9b4316aaF942163A144a4aeF370c1339037FD";
 const pagosAutomaticosABI = [
 	{
 		"inputs": [
@@ -318,7 +318,7 @@ const pagosAutomaticosABI = [
 	}
 ]
 
-const fondoPrestamistaAddress = "0xE21684Bf3d12F6c94492a258f7755Fc631a8D3b0";
+const fondoPrestamistaAddress = "0x97268B99390DB65c2c99845ED97411E436e4dEf6";
 const fondoPrestamistaABI = [
 	{
 		"inputs": [
@@ -502,15 +502,29 @@ window.addEventListener('load', async () => {
 					}
 					const prestatario = currentAccounts[0];
 					const prestamo = await gestionPrestamo.methods.prestamos(prestatario).call();
-					const cuotaWei = prestamo.cuotaMensual;
-					const cuotaETH = web3.utils.fromWei(cuotaWei, 'ether');
-					await gestionPrestamo.methods.pagarCuota().send({ from: prestatario, value: cuotaWei });
-					alert(`Cuota de ${cuotaETH} ETH pagada exitosamente.`);
+
+					// Convierte todo a BigInt
+					const cuotaMensual = BigInt(prestamo.cuotaMensual); // ya está en Wei
+					const tasaInteres = BigInt(prestamo.tasaInteres);
+
+					// interés = (cuotaMensual * tasaInteres) / 100
+					const interesCalculado = (cuotaMensual * tasaInteres) / 100n;
+
+					// total a pagar (ya en Wei, entero)
+					const totalAPagar = cuotaMensual + interesCalculado;
+
+					// Envía la transacción directamente
+					await gestionPrestamo.methods.pagarCuota().send({
+						from: prestatario,
+						value: totalAPagar.toString() // string de BigInt, sin decimales
+					});
+					alert(`Cuota de ${totalAPagar} ETH pagada exitosamente.`);
 				} catch (error) {
 					console.error(error);
 					alert("Error al pagar la cuota. Asegúrate de tener un préstamo activo y el monto suficiente.");
 				}
 			});
+
 
 			document.getElementById("btnDepositarPrestamista").addEventListener("click", async () => {
 				try {

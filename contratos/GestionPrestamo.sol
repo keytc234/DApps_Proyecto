@@ -140,3 +140,4 @@ contract GestionPrestamo {
         auditoria.registrarPago(msg.sender, totalAPagar);
     }
 }
+  
