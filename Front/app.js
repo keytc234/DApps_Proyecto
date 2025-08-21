@@ -416,7 +416,6 @@ let gestionPrestamo;
 let pagosAutomaticos;
 let fondoPrestamista;
 
-// Espera a que el documento esté completamente cargado antes de ejecutar cualquier código
 window.addEventListener('load', async () => {
 	if (window.ethereum) {
 		web3 = new Web3(window.ethereum);
@@ -431,8 +430,6 @@ window.addEventListener('load', async () => {
 
 			console.log("Conectado a la cuenta:", accounts[0]);
 
-			// Mueve la lógica de los botones aquí dentro
-			// 📌 Registrar usuario
 			document.getElementById("btnRegistrar").addEventListener("click", async () => {
 				try {
 					const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
@@ -441,7 +438,6 @@ window.addEventListener('load', async () => {
 						return;
 					}
 
-					// Verificar si el usuario ya está registrado
 					const isRegistered = await registroUsuarios.methods.estaRegistrado(currentAccounts[0]).call();
 					if (isRegistered) {
 						alert("Este usuario ya está registrado.");
@@ -456,7 +452,26 @@ window.addEventListener('load', async () => {
 				}
 			});
 
-			// 📌 Crear préstamo
+			document.getElementById("btnMontoActual").addEventListener("click", async () => {
+				try {
+					const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
+					if (currentAccounts.length === 0) {
+						alert("No hay ninguna cuenta activa en MetaMask");
+						return;
+					}
+
+					const isRegistered = await registroUsuarios.methods.esPrestamista(currentAccounts[0]).call();
+					if (isRegistered) {
+						const saldoWei = await fondoPrestamista.methods.saldo().call();
+						const saldoETH = web3.utils.fromWei(saldoWei, "ether");
+						document.getElementById("montoActual").innerText = `Monto Actual: ${saldoETH} ETH`;
+					}
+				} catch (error) {
+					console.error(error);
+					alert("Error al registrar el usuario");
+				}
+			});
+
 			document.getElementById("btnCrearPrestamo").addEventListener("click", async () => {
 				try {
 					const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
@@ -478,7 +493,6 @@ window.addEventListener('load', async () => {
 				}
 			});
 
-			// 📌 Pagar cuotas
 			document.getElementById("btnPagar").addEventListener("click", async () => {
 				try {
 					const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
@@ -498,7 +512,6 @@ window.addEventListener('load', async () => {
 				}
 			});
 
-			// 📌 Depositar fondos
 			document.getElementById("btnDepositarPrestamista").addEventListener("click", async () => {
 				try {
 					const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
@@ -525,6 +538,36 @@ window.addEventListener('load', async () => {
 				} catch (error) {
 					console.error("Error al depositar fondos:", error);
 					alert("Error al depositar fondos. Asegúrate de que eres el prestamista y que la transacción fue aprobada.");
+				}
+			});
+
+			document.getElementById("btnVerPrestamo").addEventListener("click", async () => {
+				try {
+					const currentAccounts = await ethereum.request({ method: 'eth_accounts' });
+					if (currentAccounts.length === 0) return;
+
+					// Llamar a la función prestamos(address) del contrato
+					const prestamo = await gestionPrestamo.methods.prestamos(currentAccounts[0]).call();
+
+					if (!prestamo.activo) {
+						document.getElementById("infoPrestamo").innerText = "No tienes préstamos activos.";
+						return;
+					}
+
+					// Mostrar los datos del préstamo en HTML
+					document.getElementById("infoPrestamo").innerHTML = `
+            <p>Prestatario: ${prestamo.prestatario}</p>
+            <p>Monto total: ${web3.utils.fromWei(prestamo.monto, 'ether')} ETH</p>
+            <p>Saldo pendiente: ${web3.utils.fromWei(prestamo.saldoPendiente, 'ether')} ETH</p>
+            <p>Plazo: ${prestamo.plazo} meses</p>
+            <p>Cuota mensual: ${web3.utils.fromWei(prestamo.cuotaMensual, 'ether')} ETH</p>
+            <p>Pagos realizados: ${prestamo.pagosRealizados}</p>
+            <p>Próximo pago: ${new Date(prestamo.nextDueDate * 1000).toLocaleDateString()}</p>
+            <p>Porcentaje de multa: ${prestamo.porcentajeMulta}%</p>
+            <p>Tasa de interés: ${prestamo.tasaInteres}%</p>
+        `;
+				} catch (error) {
+					console.error("Error al cargar préstamo:", error);
 				}
 			});
 		} catch (error) {
